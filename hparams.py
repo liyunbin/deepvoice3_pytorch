@@ -27,7 +27,7 @@ hparams = tf.contrib.training.HParams(
     builder="deepvoice3",
 
     # Must be configured depends on the dataset and model you use
-    n_speakers=1,
+    n_speakers=763,
     speaker_embed_dim=256,
 
     # Audio:
@@ -36,7 +36,7 @@ hparams = tf.contrib.training.HParams(
     fmax=7600,
     fft_size=1024,
     hop_size=256,
-    sample_rate=22050,
+    sample_rate=16000,
     preemphasis=0.97,
     min_level_db=-100,
     ref_level_db=20,

@@ -7,7 +7,6 @@ from hparams import hparams
 from os.path import exists
 import librosa
 import pypinyin as pinyin
-from menuinst.knownfolders import PathNotFoundException
 
 
 """
@@ -36,7 +35,7 @@ def __trans_dict(indir):
         pinyin_text = pinyin.lazy_pinyin(text, pinyin.Style.TONE3)
         trans = ' '.join(pinyin_text)
         trans_dict[audio_id] = trans
-        print('len of transript dict {}'.format(len(trans_dict)))
+    print('len of transript dict {}'.format(len(trans_dict)))
     return trans_dict
 
 def build_from_path(in_dir, out_dir, num_workers=1, tqdm=lambda x: x):
@@ -47,10 +46,12 @@ def build_from_path(in_dir, out_dir, num_workers=1, tqdm=lambda x: x):
     """
     executor = ProcessPoolExecutor(max_workers=num_workers)
     futures = []
-    trans_dict = __trans_dict(indir)
-    index = 1
-    wave_files = glob.glob(os.path.join(input_dir, '*', '*.wav'))
+    train_files = glob.glob(in_dir + '/wav/train/*/*.wav')
+    dev_files = glob.glob(in_dir + '/wav/dev/*/*.wav')
+    wave_files = train_files + dev_files
     print('the all wavefiles are {}'.format(len(wave_files)))
+    trans_dict = __trans_dict(in_dir)
+    index = 1
     for wav_file in wave_files:
         wav_path = wav_file
         audio_id = os.path.basename(wav_path).split('.')[0]
@@ -59,7 +60,7 @@ def build_from_path(in_dir, out_dir, num_workers=1, tqdm=lambda x: x):
             print('audio id {} not in trans_dict!!!'.format(audio_id))
             continue
         else:
-            print('audio id {}  in trans_dict!!!'.format(audio_id))
+            # print('audio id {}  in trans_dict!!!'.format(audio_id))
             speaker_id = int(os.path.basename(wav_path)[7:11])
             futures.append(executor.submit(partial(_process_utterance, out_dir, index, speaker_id, wav_path, text)))
             index += 1
@@ -74,11 +75,6 @@ def _process_utterance(out_dir, index, speaker_id, wav_path, text):
     # Load the audio to a numpy array:
     wav = audio.load_wav(wav_path)
 
-    lab_path = wav_path.replace("wav48/", "lab/").replace(".wav", ".lab")
-
-    # Trim silence 
-    wav = audio.trim_silence(wav, hparams)
-    
     if hparams.rescaling:
         wav = wav / np.abs(wav).max() * hparams.rescaling_max
 

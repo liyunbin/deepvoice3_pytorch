@@ -553,7 +553,7 @@ def guided_attention(N, max_N, T, max_T, g):
     W = np.zeros((max_N, max_T), dtype=np.float32)
     for n in range(N):
         for t in range(T):
-            W[n, t] = 1 - np.exp(-(n / N - t / T)**2 / (2 * g * g))
+            W[n, t] = 1 - np.exp(-(n / N - t / T) ** 2 / (2 * g * g))
     return W
 
 
@@ -864,6 +864,7 @@ def restore_parts(path, model):
 
 
 if __name__ == "__main__":
+    torch.cuda.set_device(1)
     args = docopt(__doc__)
     print("Command line args:\n", args)
     checkpoint_dir = args["--checkpoint-dir"]
@@ -933,7 +934,7 @@ if __name__ == "__main__":
         num_workers=hparams.num_workers, sampler=sampler,
         collate_fn=collate_fn, pin_memory=hparams.pin_memory)
 
-    device = torch.device("cuda" if use_cuda else "cpu")
+    device = torch.device("cuda")
 
     # Model
     model = build_model().to(device)
