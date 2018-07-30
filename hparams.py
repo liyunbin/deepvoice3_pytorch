@@ -28,7 +28,7 @@ hparams = tf.contrib.training.HParams(
 
     # Must be configured depends on the dataset and model you use
     n_speakers=1,
-    speaker_embed_dim=16,
+    speaker_embed_dim=256,
 
     # Audio:
     num_mels=80,
@@ -125,7 +125,7 @@ hparams = tf.contrib.training.HParams(
     # GC:
     # Forced garbage collection probability
     # Use only when MemoryError continues in Windows (Disabled by default)
-    #gc_probability = 0.001,
+    # gc_probability = 0.001,
 
     # json_meta mode only
     # 0: "use all",
