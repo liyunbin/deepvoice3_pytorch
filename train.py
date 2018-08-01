@@ -19,6 +19,9 @@ options:
     --speaker-id=<N>             Use specific speaker of data in case for multi-speaker datasets.
     -h, --help                   Show this help message and exit
 """
+import matplotlib
+matplotlib.use('Agg')
+
 from docopt import docopt
 
 import sys
@@ -47,6 +50,7 @@ from os.path import join, expanduser
 import random
 
 import librosa.display
+
 from matplotlib import pyplot as plt
 import sys
 import os
@@ -864,7 +868,6 @@ def restore_parts(path, model):
 
 
 if __name__ == "__main__":
-    torch.cuda.set_device(1)
     args = docopt(__doc__)
     print("Command line args:\n", args)
     checkpoint_dir = args["--checkpoint-dir"]
@@ -934,7 +937,7 @@ if __name__ == "__main__":
         num_workers=hparams.num_workers, sampler=sampler,
         collate_fn=collate_fn, pin_memory=hparams.pin_memory)
 
-    device = torch.device("cuda")
+    device = torch.device("cuda" if use_cuda else "cpu")
 
     # Model
     model = build_model().to(device)
