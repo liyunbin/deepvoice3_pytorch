@@ -26,13 +26,14 @@ import audio
 
 import torch
 import numpy as np
-import nltk
+#import nltk
 
 # The deepvoice3 model
 from deepvoice3_pytorch import frontend
 from hparams import hparams, hparams_debug_string
 
 from tqdm import tqdm
+import pypinyin as pinyin
 
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
@@ -134,9 +135,14 @@ if __name__ == "__main__":
         lines = f.readlines()
         for idx, line in enumerate(lines):
             text = line.decode("utf-8")[:-1]
-            words = nltk.word_tokenize(text)
+            #words = nltk.word_tokenize(text)
+            words = []
+            #文本转拼音
+            pinyin_trans = pinyin.lazy_pinyin(text, pinyin.Style.TONE3)
+            pinyin_text = ' '.join(pinyin_trans)
+            
             waveform, alignment, _, _ = tts(
-                model, text, p=replace_pronunciation_prob, speaker_id=speaker_id, fast=True)
+                model, pinyin_text, p=replace_pronunciation_prob, speaker_id=speaker_id, fast=False)
             dst_wav_path = join(dst_dir, "{}_{}{}.wav".format(
                 idx, checkpoint_name, file_name_suffix))
             dst_alignment_path = join(
